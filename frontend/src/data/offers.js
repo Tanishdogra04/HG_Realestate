@@ -1,0 +1,102 @@
+export const offers = [
+  {
+    id: 'offer-metro-shoes',
+    brandId: 'metro-shoes',
+    name: 'METRO SHOES',
+    offerTitle: 'Up to 50% Off',
+    image: 'https://hgeaton.com/pimgs/htl/29/metroshose200x150_n.jpg',
+    logo: 'https://hgeaton.com/pimgs/htl/29/metroshose200x150_n.jpg',
+    catId: 2,
+    subCatId: 17,
+    views: 1200,
+    location: 'Ground Floor',
+    description: 'Special seasonal discount on entire footwear range.'
+  },
+  {
+    id: 'offer-scentra',
+    brandId: 'scentra',
+    name: 'SCENTRA',
+    offerTitle: 'UP TO 50%',
+    image: 'https://hgeaton.com/pimgs/htl/191/oip.webp',
+    logo: 'https://hgeaton.com/pimgs/htl/191/oip.webp',
+    catId: 2,
+    subCatId: 17,
+    views: 840,
+    location: 'Plaza Level',
+    description: 'Flat 50% off on all luxury fragrance and footwear collections.'
+  },
+  {
+    id: 'offer-golden-grab',
+    brandId: 'golden-grab',
+    name: 'GOLDEN GRAB',
+    offerTitle: 'Winter up to 70% off',
+    image: 'https://hgeaton.com/pimgs/htl/18/goldengrab200x150_n.jpg',
+    logo: 'https://hgeaton.com/pimgs/htl/18/goldengrab200x150_n.jpg',
+    catId: 1,
+    views: 2100,
+    location: 'First Floor',
+    description: 'Massive winter clearance sale. Stock up on fashion essentials.'
+  },
+  {
+    id: 'offer-my-trident',
+    brandId: 'my-trident',
+    name: 'MY TRIDENT',
+    offerTitle: 'UP TO 50%',
+    image: 'https://hgeaton.com/pimgs/htl/22/mytrident200x150_n.jpg',
+    logo: 'https://hgeaton.com/pimgs/htl/22/mytrident200x150_n.jpg',
+    catId: 5,
+    views: 950,
+    location: 'Main Floor',
+    description: 'Exclusive furniture and home decor discounts for club members.'
+  },
+  {
+    id: 'offer-sportking',
+    brandId: 'sportking',
+    name: 'SPORTKING',
+    offerTitle: 'SUMMER OFFER UP TO 50%',
+    image: 'https://hgeaton.com/pimgs/htl/25/sportking200x150_n.jpg',
+    logo: 'https://hgeaton.com/pimgs/htl/25/sportking200x150_n.jpg',
+    catId: 2,
+    subCatId: 16,
+    views: 1100,
+    location: 'Ground Floor',
+    description: 'Get ready for summer with half-price deals on all sportswear.'
+  },
+  {
+    id: 'offer-mi-arcus',
+    brandId: 'mi-arcus',
+    name: 'MI ARCUS',
+    offerTitle: 'UPTO 50%',
+    image: 'https://hgeaton.com/pimgs/htl/106/miacrus200x150_n.jpg',
+    logo: 'https://hgeaton.com/pimgs/htl/106/miacrus200x150_n.jpg',
+    catId: 4,
+    views: 720,
+    location: 'First Floor',
+    description: 'Premium electronics and gadgets at unbeatable prices.'
+  },
+  {
+    id: 'offer-levis',
+    brandId: 'levis',
+    name: 'LEVIS',
+    offerTitle: 'Flat 30% Off',
+    image: 'https://hgeaton.com/pimgs/htl/24/levis200x150_n.jpg',
+    logo: 'https://hgeaton.com/pimgs/htl/24/levis200x150_n.jpg',
+    catId: 1,
+    subCatId: 11,
+    views: 1800,
+    location: 'Ground Floor',
+    description: 'The denim festival is back! Shop your favorites at 30% off.'
+  },
+  {
+    id: 'offer-starbucks',
+    brandId: 'starbucks',
+    name: 'STARBUCKS',
+    offerTitle: 'Buy 1 Get 1 Free',
+    image: 'https://hgeaton.com/pimgs/htl/85/starbuccofee200x150_n.jpg',
+    logo: 'https://hgeaton.com/pimgs/htl/85/starbuccofee200x150_n.jpg',
+    catId: 6,
+    views: 2500,
+    location: 'Gateway Entrance',
+    description: 'Happy Hours! Buy 1 get 1 free on all tall-sized beverages.'
+  }
+];

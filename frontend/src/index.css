@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #15803d; /* Green color from the logo */
+  --color-brand-secondary: #000000;
+  --color-brand-dark: #28313d;
+  
+  --animate-bounce-up: bounce-up 0.4s ease-in-out;
+
+  @keyframes bounce-up {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+}
+
+body {
+  @apply bg-gray-50 text-gray-900;
+  font-family: 'Inter', sans-serif;
+}
