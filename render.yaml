@@ -4,19 +4,18 @@ services:
   - type: web
     name: hgeaton-api
     runtime: node
-    plan: free # Change to pro for better performance
-    rootDir: backend
-    buildCommand: npm install
-    startCommand: npm start
+    plan: free
+    buildCommand: npm install --prefix backend
+    startCommand: npm start --prefix backend
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 5000
       - key: MONGODB_URI
-        sync: false # Set manually in Render dashboard
+        sync: false
       - key: JWT_SECRET
-        sync: false # Set manually in Render dashboard
+        sync: false
       - key: CORS_ORIGIN
         fromStaticSite:
           name: hgeaton-frontend
@@ -25,10 +24,8 @@ services:
   # Frontend Dashboard
   - type: static
     name: hgeaton-frontend
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    publishDir: dist
+    buildCommand: npm install --prefix frontend && npm run build --prefix frontend
+    publishDir: frontend/dist
     envVars:
       - key: VITE_API_URL
         fromService:
