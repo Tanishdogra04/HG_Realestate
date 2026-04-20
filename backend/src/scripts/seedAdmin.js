@@ -18,25 +18,21 @@ const seedAdmin = async () => {
 
     const adminEmail = 'admin@admin.com';
     const adminPassword = 'admin123';
+    const hashedPassword = await hashPassword(adminPassword);
 
-    const existingAdmin = await User.findOne({ email: adminEmail });
-    
-    if (existingAdmin) {
-      console.log('ℹ️ Admin user already exists');
-      console.log('📧 Email:', adminEmail);
-      console.log('🔑 Password:', adminPassword);
-    } else {
-      const hashedPassword = await hashPassword(adminPassword);
-      await User.create({
+    const result = await User.findOneAndUpdate(
+      { email: adminEmail },
+      { 
         name: 'Super Admin',
-        email: adminEmail,
         password: hashedPassword,
         role: 'admin'
-      });
-      console.log('🚀 Simple Admin user created successfully!');
-      console.log('📧 Email:', adminEmail);
-      console.log('🔑 Password:', adminPassword);
-    }
+      },
+      { upsert: true, new: true }
+    );
+
+    console.log('🚀 Admin account synchronized successfully!');
+    console.log('📧 Email:', adminEmail);
+    console.log('🔑 Password:', adminPassword);
   } catch (err) {
     console.error('❌ Error seeding admin:', err);
   } finally {
