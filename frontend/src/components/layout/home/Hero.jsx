@@ -3,9 +3,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Hero = () => {
   const images = [
-    "/s1.jpeg",
-    "/s2.jpg",
-    "/s3.jpg"
+    "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=1600&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=1600&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1600&h=800&fit=crop"
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);

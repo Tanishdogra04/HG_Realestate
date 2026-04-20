@@ -1,11 +1,27 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import BrandSidebar from '../components/layout/brands/BrandSidebar';
 import BrandFilterBar from '../components/layout/brands/BrandFilterBar';
 import OfferCard from '../components/layout/brands/OfferCard';
-import { offers } from '../data/offers';
+import api from '../utils/api';
+// import { offers } from '../data/offers';
 
 const Offers = ({ onBrandClick }) => {
-  // Filter & Sort State
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const res = await api.get('/offers');
+        setOffers(res.data);
+      } catch (err) {
+        console.error('Failed to fetch offers:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOffers();
+  }, []);
   const [filters, setFilters] = useState({
     keyword: '',
     outletName: '',
@@ -42,17 +58,17 @@ const Offers = ({ onBrandClick }) => {
   const filteredOffers = useMemo(() => {
     let result = offers.filter(offer => {
       // Keyword filter
-      const matchesKeyword = offer.name.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-                            offer.offerTitle.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-                            (offer.description && offer.description.toLowerCase().includes(filters.keyword.toLowerCase()));
+      const matchesKeyword = (offer.brandName?.toLowerCase().includes(filters.keyword.toLowerCase()) || false) ||
+                            (offer.title?.toLowerCase().includes(filters.keyword.toLowerCase()) || false) ||
+                            (offer.description?.toLowerCase().includes(filters.keyword.toLowerCase()) || false);
       
       // Outlet filter
-      const matchesOutlet = offer.location?.toLowerCase().includes(filters.outletName.toLowerCase()) ||
-                           offer.name.toLowerCase().includes(filters.outletName.toLowerCase());
+      const matchesOutlet = (offer.location?.toLowerCase().includes(filters.outletName.toLowerCase()) || false) ||
+                           (offer.brandName?.toLowerCase().includes(filters.outletName.toLowerCase()) || false);
 
       // Category filter
-      const matchesCat = filters.selectedCats.length === 0 || filters.selectedCats.includes(offer.catId);
-      const matchesSubCat = filters.selectedSubCats.length === 0 || filters.selectedSubCats.includes(offer.subCatId);
+      const matchesCat = filters.selectedCats.length === 0 || filters.selectedCats.includes(offer.categoryId);
+      const matchesSubCat = filters.selectedSubCats.length === 0 || filters.selectedSubCats.includes(offer.subCategoryId);
 
       // Featured filter
       const matchesFeatured = !featuredOnly || offer.views > 1000;
@@ -62,14 +78,14 @@ const Offers = ({ onBrandClick }) => {
 
     // Sorting
     result.sort((a, b) => {
-      if (sortBy === 'az') return a.name.localeCompare(b.name);
-      if (sortBy === 'za') return b.name.localeCompare(a.name);
-      if (sortBy === 'popularity') return b.views - a.views;
+      if (sortBy === 'az') return (a.brandName || '').localeCompare(b.brandName || '');
+      if (sortBy === 'za') return (b.brandName || '').localeCompare(a.brandName || '');
+      if (sortBy === 'popularity') return (b.views || 0) - (a.views || 0);
       return 0;
     });
 
     return result;
-  }, [filters, sortBy, featuredOnly]);
+  }, [offers, filters, sortBy, featuredOnly]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -111,11 +127,15 @@ const Offers = ({ onBrandClick }) => {
             />
 
             {/* Results Grid */}
-            {filteredOffers.length > 0 ? (
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="w-12 h-12 border-4 border-[#EE171F]/20 border-t-[#EE171F] rounded-full animate-spin" />
+              </div>
+            ) : filteredOffers.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 animate-in fade-in duration-500">
                 {filteredOffers.map(offer => (
                   <OfferCard 
-                    key={offer.id} 
+                    key={offer._id || offer.id} 
                     offer={offer} 
                     onClick={() => onBrandClick?.({ id: offer.brandId })} 
                   />

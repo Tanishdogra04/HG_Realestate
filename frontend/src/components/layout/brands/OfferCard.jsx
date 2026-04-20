@@ -50,8 +50,8 @@ const OfferCard = ({ offer, onClick }) => {
           onClick={() => onClick(offer)}
         >
           <img 
-            src={offer.logo} 
-            alt={offer.name} 
+            src={offer.brandLogo || offer.logo} 
+            alt={offer.brandName} 
             className="w-full h-full object-contain"
           />
         </div>
@@ -62,13 +62,13 @@ const OfferCard = ({ offer, onClick }) => {
             className="text-gray-400 font-bold text-[11px] uppercase tracking-widest hover:text-[#0c9a50] cursor-pointer"
             onClick={() => onClick(offer)}
           >
-            {offer.name}
+            {offer.brandName}
           </h3>
           <div 
             className="text-[#28313d] font-extrabold text-lg leading-tight group-hover:text-[#EE171F] transition-colors cursor-pointer"
             onClick={() => onClick(offer)}
           >
-            {offer.offerTitle}
+            {offer.title}
           </div>
           <p className="text-gray-500 text-[13px] line-clamp-1 italic">
             {offer.description}

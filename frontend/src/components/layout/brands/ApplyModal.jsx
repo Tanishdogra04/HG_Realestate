@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import api from '../../../utils/api';
+import toast from 'react-hot-toast';
 
 const CloseIcon = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -17,14 +19,23 @@ const ApplyModal = ({ job, isOpen, onClose, mode = 'apply' }) => {
 
   if (!isOpen || !job) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    
+    try {
+      await api.post('/applications', {
+        job: job._id || job.id,
+        ...formState
+      });
       setIsSuccess(true);
-    }, 1500);
+      toast.success('Application submitted successfully!');
+    } catch (err) {
+      toast.error('Failed to submit application. Please try again.');
+      console.error('Submission error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {

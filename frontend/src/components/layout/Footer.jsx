@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Footer = () => {
+const Footer = ({ onLinkClick }) => {
   return (
     <footer className="bg-[#28313d] text-white pt-16 pb-8">
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
@@ -22,12 +22,22 @@ const Footer = () => {
           <h4 className="text-xl font-bold mb-6 tracking-wide">Useful Links</h4>
           <ul className="grid grid-cols-1 gap-3 text-base text-white">
             {[
-              'Outlet Login', 'About Us', 'Contact Us', 'Privacy Polices', 
-              'Terms and Conditions', 'Service Level Aggrement', 
-              'Refunds and Cancellation', 'Shipping and Delivery'
+              { label: 'Outlet Login', view: 'LOGIN' },
+              { label: 'About Us', view: 'ABOUT' },
+              { label: 'Contact Us', view: 'CONTACT' },
+              { label: 'Privacy Polices', view: 'PRIVACY' },
+              { label: 'Terms and Conditions', view: 'TERMS' },
+              { label: 'Service Level Aggrement', view: 'SLA' },
+              { label: 'Refunds and Cancellation', view: 'REFUND' },
+              { label: 'Shipping and Delivery', view: 'SHIPPING' }
             ].map((link) => (
-              <li key={link}>
-                <a href="#" className="hover:opacity-80 transition-opacity block py-1">{link}</a>
+              <li key={link.label}>
+                <button 
+                  onClick={() => onLinkClick(link.view)} 
+                  className="hover:opacity-80 transition-opacity block py-1 text-left w-full"
+                >
+                  {link.label}
+                </button>
               </li>
             ))}
           </ul>

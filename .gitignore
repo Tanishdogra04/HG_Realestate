@@ -1,0 +1,30 @@
+# Root .gitignore for HG Real Estate
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Environment Variables
+.env
+.env.local
+frontend/.env
+backend/.env
+
+# Production Builds
+dist/
+frontend/dist/
+
+# Logs
+*.log
+frontend/npm-debug.log*
+backend/npm-debug.log*
+frontend/nohup.out
+
+# OS Files
+.DS_Store
+Thumb.db
+
+# IDEs
+.vscode/
+.idea/

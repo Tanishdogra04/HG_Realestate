@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import api from '../utils/api';
+import { AlertCircle } from 'lucide-react';
 
 const Mail = ({ size = 24, className }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
@@ -9,16 +11,46 @@ const Check = ({ size = 20 }) => (
 );
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    city: '',
+    subject: '',
+    message: '',
+    agreed: false
+  });
+  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = 'Full name is required';
+    if (!formData.email) newErrors.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+    if (!formData.phone.trim()) newErrors.phone = 'Contact number is required';
+    if (!formData.subject) newErrors.subject = 'Please select a subject';
+    if (!formData.message.trim()) newErrors.message = 'Message is required';
+    if (!formData.agreed) newErrors.agreed = 'You must agree to the terms';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
+    
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await api.post('/enquiries', formData);
       setIsSuccess(true);
-    }, 1500);
+    } catch (err) {
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -76,66 +108,85 @@ const Contact = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-1">
                     <input 
-                      required
                       type="text" 
                       placeholder="Full Name"
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded outline-none focus:border-blue-500 transition-all shadow-sm"
+                      className={`w-full px-4 py-3 bg-white border rounded outline-none transition-all shadow-sm ${errors.name ? 'border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
+                    {errors.name && <span className="text-xs text-red-500">{errors.name}</span>}
                   </div>
                   <div className="space-y-1">
                     <input 
-                      required
                       type="email" 
                       placeholder="Email"
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded outline-none focus:border-blue-500 transition-all shadow-sm"
+                      className={`w-full px-4 py-3 bg-white border rounded outline-none transition-all shadow-sm ${errors.email ? 'border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
+                    {errors.email && <span className="text-xs text-red-500">{errors.email}</span>}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-1">
                     <input 
-                      required
                       type="tel" 
                       placeholder="Contact No."
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded outline-none focus:border-blue-500 transition-all shadow-sm"
+                      className={`w-full px-4 py-3 bg-white border rounded outline-none transition-all shadow-sm ${errors.phone ? 'border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     />
+                    {errors.phone && <span className="text-xs text-red-500">{errors.phone}</span>}
                   </div>
                   <div className="space-y-1">
                     <input 
-                      required
                       type="text" 
                       placeholder="City"
                       className="w-full px-4 py-3 bg-white border border-gray-200 rounded outline-none focus:border-blue-500 transition-all shadow-sm"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <select 
-                    required
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded outline-none focus:border-blue-500 transition-all shadow-sm text-gray-400"
+                    className={`w-full px-4 py-3 bg-white border rounded outline-none transition-all shadow-sm ${errors.subject ? 'border-red-500' : 'border-gray-200 focus:border-blue-500'} ${!formData.subject && 'text-gray-400'}`}
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   >
-                    <option value="" disabled selected>Select Subject</option>
+                    <option value="" disabled>Select Subject</option>
                     <option value="general">General Inquiry</option>
                     <option value="business">Business Opportunity</option>
                     <option value="support">Tenant Support</option>
                     <option value="other">Other</option>
                   </select>
+                  {errors.subject && <span className="text-xs text-red-500">{errors.subject}</span>}
                 </div>
 
                 <div className="space-y-1">
                   <textarea 
-                    required
                     rows="5"
                     placeholder="Your message..."
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded outline-none focus:border-blue-500 transition-all shadow-sm resize-none"
+                    className={`w-full px-4 py-3 bg-white border rounded outline-none transition-all shadow-sm resize-none ${errors.message ? 'border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   ></textarea>
+                  {errors.message && <span className="text-xs text-red-500">{errors.message}</span>}
                 </div>
 
-                <div className="flex items-center space-x-3">
-                  <input type="checkbox" required className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300" />
-                  <span className="text-sm text-gray-500">I agree to the <span className="text-blue-600 cursor-pointer">Terms</span> and <span className="text-blue-600 cursor-pointer">Privacy</span>.</span>
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center space-x-3">
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300"
+                      checked={formData.agreed}
+                      onChange={(e) => setFormData({ ...formData, agreed: e.target.checked })}
+                    />
+                    <span className="text-sm text-gray-500">I agree to the <span className="text-blue-600 cursor-pointer">Terms</span> and <span className="text-blue-600 cursor-pointer">Privacy</span>.</span>
+                  </div>
+                  {errors.agreed && <span className="text-xs text-red-500">{errors.agreed}</span>}
                 </div>
 
                 <button 

@@ -9,13 +9,19 @@ import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import GuideMap from './pages/GuideMap';
 import OutletDetail from './pages/OutletDetail';
+import LegalPage from './pages/LegalPage';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import { brands } from './data/brands';
 import { extraBrands } from './data/extraBrands';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import AdminDashboard from './pages/AdminDashboard';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { Toaster } from 'react-hot-toast';
 
-function App() {
-
+function AppContent() {
+  const { user, isAdmin, logout } = useAuth();
   const [currentView, setCurrentView] = useState('HOME');
   const [selectedBrand, setSelectedBrand] = useState(null);
 
@@ -31,9 +37,13 @@ function App() {
     let resolvedData = data;
     
     // If we only have an ID (e.g. from Offers/Jobs), find the full brand object
-    if (view === 'OUTLET_DETAIL' && data && data.id && !data.name) {
+    if (view === 'OUTLET_DETAIL' && data && (data.id || data._id) && !data.name) {
       const allBrands = [...brands, ...extraBrands];
-      const foundBrand = allBrands.find(b => b.id === data.brandId || b.id === data.id);
+      const foundBrand = allBrands.find(b => 
+        (data.id && (b.id === data.id || b._id === data.id)) || 
+        (data.brandId && (b.id === data.brandId || b._id === data.brandId)) ||
+        (data._id && (b.id === data._id || b._id === data._id))
+      );
       if (foundBrand) resolvedData = foundBrand;
     }
 
@@ -44,7 +54,7 @@ function App() {
 
   return (
     <div className="App min-h-screen flex flex-col bg-white">
-      {currentView !== 'MAP' && (
+      {currentView !== 'MAP' && currentView !== 'ADMIN' && (
         <Navbar 
           currentView={currentView}
           onHomeClick={() => navigateTo('HOME')} 
@@ -55,6 +65,8 @@ function App() {
           onJobsClick={() => navigateTo('JOBS')}
           onContactClick={() => navigateTo('CONTACT')}
           onGalleryClick={() => navigateTo('GALLERY')}
+          onLoginClick={() => navigateTo('LOGIN')}
+          onAdminClick={() => navigateTo('ADMIN')}
         />
       )}
       
@@ -89,11 +101,53 @@ function App() {
         {currentView === 'HOME' && (
           <Home onBrandClick={(brand) => navigateTo('OUTLET_DETAIL', brand)} />
         )}
+        {currentView === 'LOGIN' && (
+          <Login 
+            onSignupClick={() => navigateTo('SIGNUP')} 
+            onSuccess={() => navigateTo('HOME')} 
+          />
+        )}
+        {currentView === 'SIGNUP' && (
+          <Signup 
+            onLoginClick={() => navigateTo('LOGIN')} 
+            onSuccess={() => navigateTo('HOME')} 
+          />
+        )}
+        {currentView === 'PRIVACY' && <LegalPage type="privacy" />}
+        {currentView === 'TERMS' && <LegalPage type="terms" />}
+        {currentView === 'SLA' && <LegalPage type="sla" />}
+        {currentView === 'REFUND' && <LegalPage type="refund" />}
+        {currentView === 'SHIPPING' && <LegalPage type="shipping" />}
+        {currentView === 'ADMIN' && (
+          (isAdmin || user?.role === 'tenant') ? (
+            <AdminDashboard 
+              onLogout={() => { logout(); navigateTo('HOME'); }} 
+              onViewSite={() => navigateTo('HOME')}
+            />
+          ) : (
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+                <p className="text-gray-500 mb-4">You do not have permission to view this page.</p>
+                <button onClick={() => navigateTo('HOME')} className="text-brand-primary font-bold underline">Go Back Home</button>
+              </div>
+            </div>
+          )
+        )}
       </main>
 
-      {currentView !== 'MAP' && <Footer />}
+      {currentView !== 'MAP' && currentView !== 'ADMIN' && (
+        <Footer onLinkClick={navigateTo} />
+      )}
+      <Toaster position="top-right" />
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}

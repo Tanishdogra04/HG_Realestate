@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { User, LogIn, Lock } from 'lucide-react';
 
 // Custom Icons to avoid dependency issues with lucide-react in this environment
 const MenuIcon = ({ size = 24 }) => (
@@ -27,8 +29,9 @@ const InstagramIcon = ({ size = 18 }) => (
     </svg>
 );
 
-const Navbar = ({ onHomeClick, onAboutClick, onBrandsClick, onOutletsClick, onOffersClick, onJobsClick, onContactClick, onGalleryClick, currentView }) => {
+const Navbar = ({ onHomeClick, onAboutClick, onBrandsClick, onOutletsClick, onOffersClick, onJobsClick, onContactClick, onGalleryClick, onLoginClick, onAdminClick, currentView }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { user, logout, isAdmin } = useAuth();
     
     const handleLinkClick = (e, item) => {
         e.preventDefault();
@@ -52,6 +55,12 @@ const Navbar = ({ onHomeClick, onAboutClick, onBrandsClick, onOutletsClick, onOf
             onContactClick();
         } else if (item.view === 'GALLERY' && onGalleryClick) {
             onGalleryClick();
+        } else if (item.view === 'LOGIN' && onLoginClick) {
+            onLoginClick();
+        } else if (item.view === 'ADMIN' && onAdminClick) {
+            onAdminClick();
+        } else if (item.view === 'SIGNUP' && onLoginClick) {
+            onLoginClick(); // Re-use login modal state but can be refined
         }
         
         setIsMenuOpen(false);
@@ -66,7 +75,9 @@ const Navbar = ({ onHomeClick, onAboutClick, onBrandsClick, onOutletsClick, onOf
         { label: 'Offers', path: '/offers', view: 'OFFERS' },
         { label: 'Jobs', path: '/jobs', view: 'JOBS' },
         { label: 'Guide Map', path: '/guide-map', view: 'MAP' },
-        { label: 'Contact us', path: '/contact', view: 'CONTACT' }
+        { label: 'Contact us', path: '/contact', view: 'CONTACT' },
+        ...(!user || user.role === 'user' ? [{ label: 'List Your Brand', path: '/signup', view: 'SIGNUP', secondary: true }] : []),
+        ...(isAdmin || user?.role === 'tenant' ? [{ label: 'Dashboard', path: '/admin', view: 'ADMIN', icon: Lock }] : [])
     ];
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -114,6 +125,34 @@ const Navbar = ({ onHomeClick, onAboutClick, onBrandsClick, onOutletsClick, onOf
                             ))}
                         </nav>
 
+                        <div className="hidden sm:flex items-center gap-2">
+                            {user ? (
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-100">
+                                        <div className="w-6 h-6 bg-brand-dark rounded-full flex items-center justify-center text-white">
+                                            <User size={14} />
+                                        </div>
+                                        <span className="text-xs font-bold text-gray-700">{user.name.split(' ')[0]}</span>
+                                    </div>
+                                    <button 
+                                        onClick={logout}
+                                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                                        title="Logout"
+                                    >
+                                        <LogIn size={20} className="rotate-180" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <button 
+                                    onClick={onLoginClick}
+                                    className="flex items-center gap-2 px-4 py-2 bg-brand-dark text-white rounded text-xs font-bold hover:bg-black transition-all shadow-sm"
+                                >
+                                    <LogIn size={14} />
+                                    LOGIN
+                                </button>
+                            )}
+                        </div>
+
                         <button 
                             onClick={toggleMenu}
                             className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
@@ -132,7 +171,7 @@ const Navbar = ({ onHomeClick, onAboutClick, onBrandsClick, onOutletsClick, onOf
                                 <a
                                     href={item.path}
                                     onClick={(e) => handleLinkClick(e, item)}
-                                    className={`px-4 py-1.5 border-2 transition-all hover:border-white rounded-none ${currentView === item.view ? 'border-white bg-white text-[#28313d]' : 'border-transparent'}`}
+                                    className={`px-4 py-1.5 border-2 transition-all hover:border-white rounded-none ${currentView === item.view ? 'border-white bg-white text-[#28313d]' : 'border-transparent'} ${item.secondary ? 'text-brand-primary font-bold' : ''}`}
                                 >
                                     {item.label}
                                 </a>
@@ -159,6 +198,35 @@ const Navbar = ({ onHomeClick, onAboutClick, onBrandsClick, onOutletsClick, onOf
                                 </a>
                             </li>
                         ))}
+
+                        {/* Mobile Auth Items */}
+                        <li className="pt-6 border-t border-white/10">
+                            {user ? (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-center gap-3 text-white">
+                                        <div className="w-8 h-8 bg-brand-primary rounded-full flex items-center justify-center">
+                                            <User size={16} />
+                                        </div>
+                                        <span className="font-bold">{user.name}</span>
+                                    </div>
+                                    <button 
+                                        onClick={logout}
+                                        className="w-full py-3 bg-red-500/20 text-red-400 rounded font-bold flex items-center justify-center gap-2"
+                                    >
+                                        <LogIn size={18} className="rotate-180" />
+                                        LOGOUT
+                                    </button>
+                                </div>
+                            ) : (
+                                <button 
+                                    onClick={onLoginClick}
+                                    className="w-full py-3 bg-brand-primary text-white rounded font-bold flex items-center justify-center gap-2 shadow-lg"
+                                >
+                                    <LogIn size={18} />
+                                    LOGIN / JOIN
+                                </button>
+                            )}
+                        </li>
                     </ul>
                 </div>
             </div>

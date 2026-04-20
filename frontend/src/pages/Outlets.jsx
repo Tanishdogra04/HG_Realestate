@@ -1,13 +1,28 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import BrandSidebar from '../components/layout/brands/BrandSidebar';
 import BrandFilterBar from '../components/layout/brands/BrandFilterBar';
 import BrandDirectoryCard from '../components/layout/brands/BrandDirectoryCard';
-import { brands } from '../data/brands';
-import { extraBrands } from '../data/extraBrands';
+import api from '../utils/api';
+// import { brands } from '../data/brands';
+// import { extraBrands } from '../data/extraBrands';
 
 const Outlets = ({ onBrandClick }) => {
-  // Combine all brands for directory
-  const allBrands = useMemo(() => [...brands, ...extraBrands], []);
+  const [allBrands, setAllBrands] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await api.get('/brands');
+        setAllBrands(res.data);
+      } catch (err) {
+        console.error('Failed to fetch brands:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBrands();
+  }, []);
 
   // Filter & Sort State
   const [filters, setFilters] = useState({
@@ -54,8 +69,8 @@ const Outlets = ({ onBrandClick }) => {
                            brand.name.toLowerCase().includes(filters.outletName.toLowerCase());
 
       // Category filter
-      const matchesCat = filters.selectedCats.length === 0 || filters.selectedCats.includes(brand.catId);
-      const matchesSubCat = filters.selectedSubCats.length === 0 || filters.selectedSubCats.includes(brand.subCatId);
+      const matchesCat = filters.selectedCats.length === 0 || filters.selectedCats.includes(brand.categoryId);
+      const matchesSubCat = filters.selectedSubCats.length === 0 || filters.selectedSubCats.includes(brand.subCategoryId);
 
       // Featured filter (e.g., views > 1000)
       const matchesFeatured = !featuredOnly || brand.views > 1000;
@@ -114,11 +129,15 @@ const Outlets = ({ onBrandClick }) => {
             />
 
             {/* Results Grid */}
-            {filteredBrands.length > 0 ? (
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="w-12 h-12 border-4 border-[#0c9a50]/20 border-t-[#0c9a50] rounded-full animate-spin" />
+              </div>
+            ) : filteredBrands.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 animate-in fade-in duration-500">
                 {filteredBrands.map(brand => (
                   <BrandDirectoryCard 
-                    key={brand.id} 
+                    key={brand._id || brand.id} 
                     brand={brand} 
                     onClick={onBrandClick} 
                   />

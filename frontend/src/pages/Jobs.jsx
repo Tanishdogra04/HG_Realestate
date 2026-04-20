@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import BrandSidebar from '../components/layout/brands/BrandSidebar';
 import JobCard from '../components/layout/brands/JobCard';
 import ApplyModal from '../components/layout/brands/ApplyModal';
-import { jobs } from '../data/jobs';
+import api from '../utils/api';
+// import { jobs } from '../data/jobs';
 
 const Jobs = () => {
   // Filter & Sort State
@@ -13,12 +14,29 @@ const Jobs = () => {
     selectedSubCats: [],
   });
 
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   // Modal State
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     job: null,
     mode: 'apply'
   });
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const res = await api.get('/jobs');
+        setJobs(res.data);
+      } catch (err) {
+        console.error('Failed to fetch jobs:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJobs();
+  }, []);
 
   // Handlers
   const handleFilterChange = (key, value) => {
@@ -55,20 +73,20 @@ const Jobs = () => {
   const filteredJobs = useMemo(() => {
     return jobs.filter(job => {
       // Keyword filter
-      const matchesKeyword = job.title.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-                            job.brandName.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-                            job.description.toLowerCase().includes(filters.keyword.toLowerCase());
+      const matchesKeyword = (job.title?.toLowerCase().includes(filters.keyword.toLowerCase()) || false) ||
+                            (job.brandName?.toLowerCase().includes(filters.keyword.toLowerCase()) || false) ||
+                            (job.description?.toLowerCase().includes(filters.keyword.toLowerCase()) || false);
       
       // Outlet filter
       const matchesOutlet = job.brandName.toLowerCase().includes(filters.outletName.toLowerCase());
 
       // Category filter
-      const matchesCat = filters.selectedCats.length === 0 || filters.selectedCats.includes(job.catId);
-      const matchesSubCat = filters.selectedSubCats.length === 0 || filters.selectedSubCats.includes(job.subCatId);
+      const matchesCat = filters.selectedCats.length === 0 || filters.selectedCats.includes(job.categoryId);
+      const matchesSubCat = filters.selectedSubCats.length === 0 || filters.selectedSubCats.includes(job.subCategoryId);
 
       return matchesKeyword && matchesOutlet && matchesCat && matchesSubCat;
     });
-  }, [filters]);
+  }, [jobs, filters]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -109,11 +127,15 @@ const Jobs = () => {
             </div>
 
             {/* Results Grid */}
-            {filteredJobs.length > 0 ? (
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="w-12 h-12 border-4 border-[#0c9a50]/20 border-t-[#0c9a50] rounded-full animate-spin" />
+              </div>
+            ) : filteredJobs.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-500">
                 {filteredJobs.map(job => (
                   <JobCard 
-                    key={job.id} 
+                    key={job._id || job.id} 
                     job={job} 
                     onApply={openApplyModal}
                     onViewDetails={openDetailsModal}
