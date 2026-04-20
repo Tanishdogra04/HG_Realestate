@@ -6,9 +6,11 @@ import Job from '../models/Job.js';
 import Offer from '../models/Offer.js';
 import Application from '../models/Application.js';
 
+dotenv.config({ path: './.env' });
+dotenv.config({ path: '../.env' });
 dotenv.config({ path: '../../.env' });
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hg_realestate';
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
 
 // --- DATA FROM brands.js ---
 const brandsMain = [
