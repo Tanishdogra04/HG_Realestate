@@ -4,11 +4,16 @@ import dotenv from 'dotenv';
 import User from '../models/User.js';
 import { hashPassword } from '../utils/hash.js';
 
+dotenv.config({ path: './.env' });
+dotenv.config({ path: '../.env' });
 dotenv.config({ path: '../../.env' });
 
 const seedAdmin = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hg_realestate');
+    const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
+    if (!uri) throw new Error('MONGO_URI is missing from environment');
+    
+    await mongoose.connect(uri);
     console.log('✅ Connected to MongoDB');
 
     const adminEmail = 'admin@admin.com';
